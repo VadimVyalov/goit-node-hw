@@ -1,0 +1,27 @@
+const { catchAsync, AppError, contactSchema } = require("../utils");
+
+validateBody = catchAsync(async (req, _, next) => {
+  if (!Object.keys(req.body).length)
+    return next(new AppError(400, "missing fields"));
+
+  const bodyNoKey = [];
+
+  if (!Object.keys(req.body).includes("name")) bodyNoKey.push("name");
+  if (!Object.keys(req.body).includes("email")) bodyNoKey.push("email");
+  if (!Object.keys(req.body).includes("phone")) bodyNoKey.push("phone");
+
+  if (bodyNoKey.length)
+    return next(
+      new AppError(
+        400,
+        `missing field${bodyNoKey.length > 1 ? "s" : ""}: ${bodyNoKey}`
+      )
+    );
+
+  const { error } = contactSchema.validate(req.body);
+  if (error) return next(new AppError(400, error.message));
+
+  next();
+});
+
+module.exports = { validateBody };
