@@ -1,5 +1,12 @@
-const { AppError } = require("./appError");
-const { catchAsync } = require("./catchAsync");
-const { contactSchema } = require("./validatorSchems");
+const AppError = require("./appError");
+const mongooseError = require("./mongooseError");
+const catchAsync = require("./catchAsync");
+const { contactSchema, favoriteSchema } = require("./validatorSchems");
 
-module.exports = { AppError, catchAsync, contactSchema };
+module.exports = {
+  AppError,
+  mongooseError,
+  catchAsync,
+  contactSchema,
+  favoriteSchema,
+};

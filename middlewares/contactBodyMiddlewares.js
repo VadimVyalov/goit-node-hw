@@ -1,4 +1,9 @@
-const { catchAsync, AppError, contactSchema } = require("../utils");
+const {
+  catchAsync,
+  AppError,
+  contactSchema,
+  favoriteSchema,
+} = require("../utils");
 
 validateBody = catchAsync(async (req, _, next) => {
   if (!Object.keys(req.body).length)
@@ -24,4 +29,14 @@ validateBody = catchAsync(async (req, _, next) => {
   next();
 });
 
-module.exports = { validateBody };
+validateFavorite = catchAsync(async (req, _, next) => {
+  if (!Object.keys(req.body).includes("favorite"))
+    return next(new AppError(400, `missing field favorite`));
+
+  const { error } = favoriteSchema.validate(req.body);
+  if (error) return next(new AppError(400, error.message));
+
+  next();
+});
+
+module.exports = { validateBody, validateFavorite };
