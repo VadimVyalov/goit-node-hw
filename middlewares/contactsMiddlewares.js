@@ -5,7 +5,7 @@ const { isValidObjectId } = require("mongoose");
  * Check contact exists in db by id middleware.
  */
 
-checkById = catchAsync(async (req, _, next) => {
+const checkById = catchAsync(async (req, _, next) => {
   const { id } = req.params;
   if (!isValidObjectId(id)) next(new AppError(400, "id no valid"));
 

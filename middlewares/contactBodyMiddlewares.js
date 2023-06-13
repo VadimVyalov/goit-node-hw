@@ -5,7 +5,7 @@ const {
   favoriteSchema,
 } = require("../utils");
 
-validateBody = catchAsync(async (req, _, next) => {
+const validateBody = catchAsync(async (req, _, next) => {
   if (!Object.keys(req.body).length)
     return next(new AppError(400, "missing fields"));
 
@@ -29,7 +29,7 @@ validateBody = catchAsync(async (req, _, next) => {
   next();
 });
 
-validateFavorite = catchAsync(async (req, _, next) => {
+const validateFavorite = catchAsync(async (req, _, next) => {
   if (!Object.keys(req.body).includes("favorite"))
     return next(new AppError(400, `missing field favorite`));
 

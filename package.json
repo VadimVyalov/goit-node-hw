@@ -9,7 +9,7 @@
     "lint:fix": "eslint --fix **/*.js"
   },
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">17 <19"
   },
   "dependencies": {
     "cors": "2.8.5",
@@ -19,8 +19,7 @@
     "joi": "^17.9.2",
     "mongodb": "^5.6.0",
     "mongoose": "^7.2.3",
-    "morgan": "1.10.0",
-    "short-uuid": "^4.2.2"
+    "morgan": "1.10.0"
   },
   "devDependencies": {
     "eslint": "7.19.0",
