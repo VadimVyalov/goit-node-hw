@@ -8,6 +8,7 @@ const contactSchema = Joi.object({
   phone: Joi.string()
     .pattern(/^\(\d{3}\) \d{3}-\d{4}$/)
     .required(),
+  favorite: Joi.boolean(),
 }).messages({
   "string.min":
     "Field 'name' length must be less than or equal to {{#limit}} characters long",
@@ -17,4 +18,8 @@ const contactSchema = Joi.object({
     "Field 'phone' has invalid phone number format. The format should be (XXX) XXX-XXXX.",
 });
 
-module.exports = { contactSchema };
+const favoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
+module.exports = { contactSchema, favoriteSchema };

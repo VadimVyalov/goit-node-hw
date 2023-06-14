@@ -1,53 +1,40 @@
-const fs = require("fs").promises;
-const path = require("path");
-const short = require("short-uuid");
-
-const contactPath = path.join(__dirname, "./contacts.json");
+const Contact = require("./contactSchema");
 
 /**
- * Get list contacts from file
+ * Get list contacts from db
  */
 
 const listContacts = async () => {
   try {
-    const data = await fs.readFile(contactPath, "utf-8");
-    const contacts = JSON.parse(data);
-    return contacts;
+    return await Contact.find();
   } catch (error) {
     console.log(error);
   }
 };
 
 /**
- * Get unique contact by id
+ * Get unique contact by id from db
  * @param {string} id - search contact id
  *
  */
 
 const getById = async (id) => {
   try {
-    const data = await fs.readFile(contactPath, "utf8");
-    const contacts = JSON.parse(data);
-    const contact = contacts.find((item) => item.id === id);
-    return contact;
+    return await Contact.findById(id);
   } catch (error) {
     console.log(error);
   }
 };
 
 /**
- * remove unique  contact by id
- * @param {string} contactId - search contact id
+ * remove unique  contact by id from db
+ * @param {string} id - search contact id
  *
  */
 
-const removeContact = async (contactId) => {
+const removeContact = async (id) => {
   try {
-    const data = await fs.readFile(contactPath, "utf-8");
-    const filterContacts = JSON.parse(data).filter(
-      (item) => item.id !== contactId
-    );
-    await fs.writeFile(contactPath, JSON.stringify(filterContacts));
+    await Contact.findByIdAndDelete(id);
     return { message: "contact deleted" };
   } catch (error) {
     console.log(error);
@@ -55,45 +42,28 @@ const removeContact = async (contactId) => {
 };
 
 /**
- * append new contact to file "../contacts.json"
+ * add new contact to db
  * @param {object} body {name, email, phone} new contact
  *
  */
 
 const addContact = async (body) => {
   try {
-    const data = await fs.readFile(contactPath, "utf-8");
-    const contacts = JSON.parse(data);
-    const newContact = {
-      id: short.generate(),
-      ...body,
-    };
-    contacts.push(newContact);
-    await fs.writeFile(contactPath, JSON.stringify(contacts));
-    return newContact;
+    return await Contact.create(body);
   } catch (error) {
     console.log(error);
   }
 };
 
 /**
- * update exist contact in file "../contacts.json"
+ * update exist contact in db
  * @param {object} body {name, email, phone} new contact
  *
  */
 
 const updateContact = async (id, body) => {
   try {
-    const data = await fs.readFile(contactPath, "utf-8");
-    const contacts = JSON.parse(data);
-    const indexContact = contacts.findIndex((item) => item.id === id);
-    if (indexContact < 0) return;
-    const updatedContact = { ...contacts[indexContact], ...body };
-
-    contacts.splice(indexContact, 1, updatedContact);
-
-    await fs.writeFile(contactPath, JSON.stringify(contacts));
-    return updatedContact;
+    return await Contact.findByIdAndUpdate(id, body, { new: true });
   } catch (error) {
     console.log(error);
   }

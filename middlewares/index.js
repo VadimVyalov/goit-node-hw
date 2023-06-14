@@ -1,4 +1,4 @@
 const { checkById } = require("./contactsMiddlewares");
-const { validateBody } = require("./contactBodyMiddlewares");
+const { validateBody, validateFavorite } = require("./contactBodyMiddlewares");
 
-module.exports = { checkById, validateBody };
+module.exports = { checkById, validateBody, validateFavorite };

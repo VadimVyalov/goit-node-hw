@@ -5,8 +5,14 @@ const {
   addContact,
   removeContact,
   updateContact,
+  updateStatusContact,
 } = require("../../controllers");
-const { checkById, validateBody } = require("../../middlewares");
+
+const {
+  checkById,
+  validateBody,
+  validateFavorite,
+} = require("../../middlewares");
 
 const router = Router();
 
@@ -19,5 +25,7 @@ router
   .get(getById)
   .delete(removeContact)
   .put(validateBody, updateContact);
+
+router.route("/:id/favorite").patch(validateFavorite, updateStatusContact);
 
 module.exports = router;
