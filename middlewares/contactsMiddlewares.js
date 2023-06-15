@@ -7,10 +7,10 @@ const { isValidObjectId } = require("mongoose");
 
 const checkById = catchAsync(async (req, _, next) => {
   const { id } = req.params;
-  if (!isValidObjectId(id)) next(new AppError(400, "id no valid"));
+  if (!isValidObjectId(id)) return next(new AppError(400, "id no valid"));
 
   const contact = await getById(id);
-  if (!contact) next(new AppError(404, "Not found"));
+  if (!contact) return next(new AppError(404, "Not found"));
 
   req.data = contact;
 
