@@ -4,9 +4,10 @@ const Contact = require("./contactSchema");
  * Get list contacts from db
  */
 
-const listContacts = async () => {
+const listContacts = async (params) => {
   try {
-    return await Contact.find();
+    const { id: owner, page = 1, limit = 10, favorite } = params;
+    return await Contact.find({ owner }).populate("owner", "-_id, email");
   } catch (error) {
     console.log(error);
   }

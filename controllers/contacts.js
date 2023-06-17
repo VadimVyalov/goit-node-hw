@@ -1,8 +1,10 @@
 const contacts = require("../models");
 const { catchAsync } = require("../utils");
 
-const listContacts = catchAsync(async (_, res) => {
-  const result = await contacts.listContacts();
+const listContacts = catchAsync(async (req, res) => {
+  const { id } = req.user;
+  const params = { id, ...req.query };
+  const result = await contacts.listContacts(params);
   res.status(200).json(result);
 });
 
@@ -17,7 +19,8 @@ const removeContact = catchAsync(async (req, res) => {
 });
 
 const addContact = catchAsync(async (req, res) => {
-  const result = await contacts.addContact(req.body);
+  const { id: owner } = req.user;
+  const result = await contacts.addContact({ ...req.body, owner });
   res.status(201).json(result);
 });
 

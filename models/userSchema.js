@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { mongooseError } = require("../utils");
+const bcrypt = require("bcrypt");
 
 const user = new Schema(
   {
@@ -23,6 +24,13 @@ const user = new Schema(
 );
 
 user.post("save", mongooseError);
+
+user.pre("save", async function (next) {
+  const salt = await bcrypt.genSalt();
+  this.password = await bcrypt.hash(this.password, salt);
+
+  next();
+});
 
 const User = model("user", user);
 

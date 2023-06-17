@@ -12,14 +12,16 @@ const {
   checkById,
   validateBody,
   validateFavorite,
+  auth,
 } = require("../../middlewares");
 
 const router = Router();
 
+router.use("/", auth);
+
 router.route("/").post(validateBody, addContact).get(listContacts);
 
 router.use("/:id", checkById);
-
 router
   .route("/:id")
   .get(getById)

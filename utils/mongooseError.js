@@ -1,13 +1,18 @@
 const mongooseError = (error, _, next) => {
-  //console.log("mongooseError", error.name);
-  const { name, code } = error;
-  error.status = name === "MongoServerError" && code === 11000 ? 409 : 400;
-  error.message =
-    name === "MongoServerError" && code === 11000
-      ? "Email in use"
-      : error.message;
-  //error.messages=
+  const { name, code = 0 } = error;
+  error.status = 400;
+
+  if (name === "MongoServerError" && code === 11000) {
+    error.status = 409;
+    error.message = "Email in use";
+  }
+
+  if (name === "ValidationError" && code === 0) {
+    error.status = 400;
+    // error.message = "ValidationError";
+  }
 
   next();
 };
+
 module.exports = mongooseError;
