@@ -7,7 +7,11 @@ const Contact = require("./contactSchema");
 const listContacts = async (params) => {
   try {
     const { id: owner, page = 1, limit = 10, favorite } = params;
-    return await Contact.find({ owner }).populate("owner", "-_id, email");
+    const skip = (page - 1) * limit;
+    return await Contact.find({ owner })
+      .skip(skip)
+      .limit(limit)
+      .populate("owner", "-_id, email");
   } catch (error) {
     console.log(error);
   }
