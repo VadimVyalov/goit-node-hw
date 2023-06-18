@@ -1,5 +1,5 @@
 const Joi = require("joi");
-
+const { SUBSCRIPTIONS } = require("../config/config");
 const contactSchema = Joi.object({
   name: Joi.string().min(2).required(),
   email: Joi.string()
@@ -22,4 +22,38 @@ const favoriteSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
 
-module.exports = { contactSchema, favoriteSchema };
+const registerSchema = Joi.object({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  password: Joi.string().min(6).required(),
+}).messages({
+  "string.email":
+    "Field 'email' has invalid email format. The format should be xxx@xxx.xxx",
+  "string.min":
+    "Field 'password' length must be less than or equal to {{#limit}} characters long",
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  password: Joi.string().required(),
+}).messages({
+  "string.email":
+    "Field 'email' has invalid email format. The format should be xxx@xxx.xxx",
+});
+
+const subscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid(...SUBSCRIPTIONS)
+    .required(),
+});
+
+module.exports = {
+  contactSchema,
+  favoriteSchema,
+  registerSchema,
+  loginSchema,
+  subscriptionSchema,
+};

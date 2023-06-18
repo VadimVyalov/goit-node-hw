@@ -1,6 +1,8 @@
 const { Schema, model } = require("mongoose");
 const { mongooseError } = require("../utils");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { SUBSCRIPTIONS, TOKEN_EXP } = require("../config/config");
 
 const user = new Schema(
   {
@@ -15,13 +17,31 @@ const user = new Schema(
     },
     subscription: {
       type: String,
-      enum: ["starter", "pro", "business"],
-      default: "starter",
+      enum: SUBSCRIPTIONS,
+      default: SUBSCRIPTIONS[0],
     },
     token: String,
   },
   { versionKey: false }
 );
+
+user.methods.validPassword = async function (password) {
+  console.log(this.id);
+  const result = await bcrypt.compare(password, this.password);
+  return result;
+};
+
+user.methods.getToken = async function (checkPassword) {
+  const { id, password } = this;
+  const { JWT_SECRET } = process.env;
+  const isValid = await bcrypt.compare(checkPassword, password);
+
+  if (!isValid) return isValid;
+
+  const payload = { id };
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXP });
+  return token;
+};
 
 user.post("save", mongooseError);
 

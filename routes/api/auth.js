@@ -7,15 +7,20 @@ const {
   updateSubscription,
 } = require("../../controllers");
 
-const { auth } = require("../../middlewares");
+const {
+  auth,
+  validateLoginBody,
+  validateRegisterBody,
+  validateSubscription,
+} = require("../../middlewares");
 
 const router = Router();
 
-router.post("/register", registration);
-router.post("/login", login);
+router.post("/register", validateRegisterBody, registration);
+router.post("/login", validateLoginBody, login);
 
 router.use("/", auth);
-router.post("/", updateSubscription);
+router.patch("/", validateSubscription, updateSubscription);
 router.post("/logout", logout);
 router.get("/current", current);
 
