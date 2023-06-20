@@ -18,7 +18,8 @@ const auth = catchAsync(async (req, _, next) => {
   const user = await User.findById(id);
 
   if (!user || !user.token || user.token !== token)
-    return next(new AppError(401, "Not authorized"));
+    // return next(new AppError(401, "Not authorized"));
+    throw AppError(401, "Not authorized");
   req.user = user;
 
   next();

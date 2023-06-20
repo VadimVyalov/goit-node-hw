@@ -3,6 +3,7 @@ const { mongooseError } = require("../utils");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SUBSCRIPTIONS, TOKEN_EXP } = require("../config/config");
+const gravatar = require("gravatar");
 
 const user = new Schema(
   {
@@ -20,6 +21,7 @@ const user = new Schema(
       enum: SUBSCRIPTIONS,
       default: SUBSCRIPTIONS[0],
     },
+    avatarURL: { type: String },
     token: String,
   },
   { versionKey: false }
@@ -48,7 +50,12 @@ user.post("save", mongooseError);
 user.pre("save", async function (next) {
   const salt = await bcrypt.genSalt();
   this.password = await bcrypt.hash(this.password, salt);
-
+  const avatarURL = gravatar.url(this.email, {
+    s: "250",
+    r: "g",
+    d: "wavatar",
+  });
+  this.avatarURL = avatarURL;
   next();
 });
 
