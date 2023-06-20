@@ -7,18 +7,17 @@ const auth = catchAsync(async (req, _, next) => {
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ") || "";
 
-  if (bearer !== "Bearer") return next(new AppError(401, "Not authorized"));
+  if (bearer !== "Bearer") throw new AppError(401, "Not authorized");
 
   const id = jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return next(new AppError(401, "Not authorized"));
+    if (err) throw new AppError(401, "Not authorized");
     return decoded.id;
   });
-  if (!id) return;
-
+  // if (!id) return;
+  //console.log(id);
   const user = await User.findById(id);
 
   if (!user || !user.token || user.token !== token)
-    // return next(new AppError(401, "Not authorized"));
     throw AppError(401, "Not authorized");
   req.user = user;
 
