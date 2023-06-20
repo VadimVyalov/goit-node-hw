@@ -6,8 +6,7 @@ const {
 } = require("../utils");
 
 const validateBody = catchAsync(async (req, _, next) => {
-  if (!Object.keys(req.body).length)
-    return next(new AppError(400, "missing fields"));
+  if (!Object.keys(req.body).length) throw new AppError(400, "missing fields");
 
   const bodyNoKey = [];
 
@@ -24,7 +23,7 @@ const validateBody = catchAsync(async (req, _, next) => {
     );
 
   const { error } = contactSchema.validate(req.body);
-  if (error) return next(new AppError(400, error.message));
+  if (error) throw new AppError(400, error.message);
 
   next();
 });
