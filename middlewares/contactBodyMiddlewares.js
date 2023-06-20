@@ -23,7 +23,7 @@ const validateBody = catchAsync(async (req, _, next) => {
     );
 
   const { error } = contactSchema.validate(req.body);
-  if (error) return next(new AppError(400, error.message));
+  if (error) throw new AppError(400, error.message);
 
   next();
 });
@@ -33,7 +33,7 @@ const validateFavorite = catchAsync(async (req, _, next) => {
     return next(new AppError(400, `missing field favorite`));
 
   const { error } = favoriteSchema.validate(req.body);
-  if (error) return next(new AppError(400, error.message));
+  if (error) throw new AppError(400, error.message);
 
   next();
 });
