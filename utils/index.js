@@ -1,4 +1,4 @@
-const AppError = require("./appError");
+const appError = require("./appError");
 const mongooseError = require("./mongooseError");
 const catchAsync = require("./catchAsync");
 const {
@@ -10,7 +10,7 @@ const {
 } = require("./validatorSchems");
 
 module.exports = {
-  AppError,
+  appError,
   mongooseError,
   catchAsync,
   contactSchema,

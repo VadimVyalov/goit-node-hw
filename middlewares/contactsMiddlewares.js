@@ -1,5 +1,5 @@
 const { getById } = require("../models");
-const { catchAsync, AppError } = require("../utils");
+const { catchAsync, appError } = require("../utils");
 const { isValidObjectId } = require("mongoose");
 /**
  * Check contact exists in db by id middleware.
@@ -7,10 +7,10 @@ const { isValidObjectId } = require("mongoose");
 
 const checkById = catchAsync(async (req, _, next) => {
   const { id } = req.params;
-  if (!isValidObjectId(id)) return next(new AppError(400, "id no valid"));
+  if (!isValidObjectId(id)) throw appError((400, "id no valid"));
 
   const contact = await getById(id);
-  if (!contact) return next(new AppError(404, "Not found"));
+  if (!contact) throw appError((404, "Not found"));
 
   req.data = contact;
 

@@ -1,32 +1,30 @@
 const User = require("../models/userSchema");
-const { catchAsync, AppError } = require("../utils");
+const { catchAsync, appError } = require("../utils");
 const path = require("path");
 const Jimp = require("jimp");
-const gravatar = require("gravatar");
+const { TOKEN } = require("../config/config");
+const { JWT_SECRET } = process.env;
 
 const registration = catchAsync(async (req, res) => {
-  // const avatarURL = gravatar.url(req.body.email, {
-  //   s: "250",
-  //   r: "g",
-  //   d: "wavatar",
-  // });
-  // const result = await User.create({ ...req.body, avatarURL });
-
   const result = await User.create(req.body);
   const { email, subscription } = result;
+
   res.status(201).json({ email, subscription });
 });
 
-const login = catchAsync(async (req, res, next) => {
+const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) return next(new AppError(401, "Email or password is wrong"));
+  if (!user) throw appError(401, "Email or password is wrong");
 
   const { subscription, id } = user;
 
-  const token = await user.getToken(password);
-  if (!token) return next(new AppError(401, " Email or password is wrong"));
+  const isValidPassword = await user.validPassword(password);
+  if (!isValidPassword) throw appError(401, " Email or password is wrong");
+
+  const token = await user.getToken(JWT_SECRET, TOKEN.access);
+  if (!token) throw appError(401, " Email or password is wrong");
 
   await User.findByIdAndUpdate(id, { token });
 
@@ -64,12 +62,12 @@ const updateSubscription = async (req, res) => {
     .json({ message: `Subscription updated to '${subscription}'` });
 };
 
-const updateAvatar = async (req, res, next) => {
+const updateAvatar = async (req, res) => {
   const { filename } = req.file;
   const { id } = req.user;
   const newFileName = `${id}_${filename}`;
 
-  if (!filename) return next(new AppError(401, "File is require!"));
+  if (!filename) throw appError(401, "File is require!");
 
   const tmpPath = path.resolve(__dirname, "../tmp", filename);
   const avatarsDir = path.resolve(__dirname, "../public/avatars", newFileName);
