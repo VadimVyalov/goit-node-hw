@@ -14,6 +14,7 @@ const {
   current,
   updateSubscription,
   updateAvatar,
+  send,
 } = require("./auth");
 
 module.exports = {
@@ -29,4 +30,5 @@ module.exports = {
   current,
   updateSubscription,
   updateAvatar,
+  send,
 };

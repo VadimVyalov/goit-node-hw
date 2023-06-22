@@ -1,5 +1,5 @@
 const User = require("../models/userSchema");
-const { catchAsync, appError } = require("../utils");
+const { catchAsync, appError, sendMail } = require("../utils");
 const path = require("path");
 const Jimp = require("jimp");
 const { TOKEN } = require("../config/config");
@@ -83,6 +83,26 @@ const updateAvatar = async (req, res) => {
     avatarURL,
   });
 };
+
+// const send = sendMail({
+//   to: "vadym.mailforhw@gmail.com",
+//   subject: "Please confirm your email",
+//   html: `<a href="http://localhost:3000/api/users/verify/">Confirm your email</a>`,
+// });
+
+const message = "Hi there, you were emailed me through nodemailer";
+const options = {
+  from: "TESTING <sender@gmail.com>", // sender address
+  to: "vadym.mailforhw@gmail.com", // receiver email
+  subject: "Send email in Node.JS with Nodemailer using Gmail account", // Subject line
+  text: message,
+  //html: HTML_TEMPLATE(message),
+};
+
+// sendMail(options, (info) => {
+//   console.log("Email sent successfully");
+//   console.log("MESSAGE ID: ", info.messageId);
+// });
 
 module.exports = {
   registration,

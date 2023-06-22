@@ -8,6 +8,7 @@ const {
   loginSchema,
   subscriptionSchema,
 } = require("./validatorSchems");
+const { sendMail } = require("./sendMail");
 
 module.exports = {
   appError,
@@ -18,4 +19,5 @@ module.exports = {
   registerSchema,
   loginSchema,
   subscriptionSchema,
+  sendMail,
 };
