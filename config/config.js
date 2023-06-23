@@ -1,3 +1,6 @@
 const SUBSCRIPTIONS = ["starter", "pro", "business"];
-const TOKEN_EXP = "300s";
-module.exports = { SUBSCRIPTIONS, TOKEN_EXP };
+const TOKEN = {
+  access: "300s",
+  refresh: "600s",
+};
+module.exports = { SUBSCRIPTIONS, TOKEN };

@@ -2,7 +2,8 @@ const { Schema, model } = require("mongoose");
 const { mongooseError } = require("../utils");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { SUBSCRIPTIONS, TOKEN_EXP } = require("../config/config");
+const { SUBSCRIPTIONS } = require("../config/config");
+const gravatar = require("gravatar");
 
 const user = new Schema(
   {
@@ -20,26 +21,20 @@ const user = new Schema(
       enum: SUBSCRIPTIONS,
       default: SUBSCRIPTIONS[0],
     },
+    avatarURL: { type: String },
     token: String,
   },
   { versionKey: false }
 );
 
-user.methods.validPassword = async function (password) {
-  console.log(this.id);
-  const result = await bcrypt.compare(password, this.password);
+user.methods.validPassword = async function (passwordCandidate) {
+  const result = await bcrypt.compare(passwordCandidate, this.password);
   return result;
 };
 
-user.methods.getToken = async function (checkPassword) {
-  const { id, password } = this;
-  const { JWT_SECRET } = process.env;
-  const isValid = await bcrypt.compare(checkPassword, password);
-
-  if (!isValid) return isValid;
-
-  const payload = { id };
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXP });
+user.methods.getToken = function (secret, exp) {
+  const payload = { id: this.id };
+  const token = jwt.sign(payload, secret, { expiresIn: exp });
   return token;
 };
 
@@ -48,7 +43,12 @@ user.post("save", mongooseError);
 user.pre("save", async function (next) {
   const salt = await bcrypt.genSalt();
   this.password = await bcrypt.hash(this.password, salt);
-
+  const avatarURL = gravatar.url(this.email, {
+    s: "250",
+    r: "g",
+    d: "wavatar",
+  });
+  this.avatarURL = avatarURL;
   next();
 });
 

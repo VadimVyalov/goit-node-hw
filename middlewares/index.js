@@ -6,6 +6,7 @@ const {
   validateSubscription,
 } = require("./userBodyMiddlewares");
 const { auth } = require("./auth");
+const upload = require("./upload");
 
 module.exports = {
   checkById,
@@ -15,4 +16,5 @@ module.exports = {
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
+  upload,
 };
