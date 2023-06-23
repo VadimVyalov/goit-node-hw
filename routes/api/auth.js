@@ -6,7 +6,8 @@ const {
   current,
   updateSubscription,
   updateAvatar,
-  send,
+  sendVerify,
+  verifyEmail,
 } = require("../../controllers");
 
 const {
@@ -14,6 +15,7 @@ const {
   validateLoginBody,
   validateRegisterBody,
   validateSubscription,
+  validateVerify,
   upload,
 } = require("../../middlewares");
 
@@ -21,7 +23,9 @@ const router = Router();
 
 router.post("/register", validateRegisterBody, registration);
 router.post("/login", validateLoginBody, login);
-//router.post("/send", send);
+router.post("/verify", validateVerify, sendVerify);
+router.get("/verify/:verificationToken", verifyEmail);
+
 router.use("/", auth);
 router.patch("/avatars", upload.single("avatar"), updateAvatar);
 router.patch("/", validateSubscription, updateSubscription);

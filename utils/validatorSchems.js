@@ -50,10 +50,20 @@ const subscriptionSchema = Joi.object({
     .required(),
 });
 
+const verifySchema = Joi.object({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+}).messages({
+  "string.email":
+    "Field 'email' has invalid email format. The format should be xxx@xxx.xxx",
+});
+
 module.exports = {
   contactSchema,
   favoriteSchema,
   registerSchema,
   loginSchema,
   subscriptionSchema,
+  verifySchema,
 };

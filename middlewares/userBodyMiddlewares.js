@@ -4,6 +4,7 @@ const {
   registerSchema,
   loginSchema,
   subscriptionSchema,
+  verifySchema,
 } = require("../utils");
 
 const validateRegisterBody = catchAsync(async (req, _, next) => {
@@ -55,8 +56,19 @@ const validateSubscription = catchAsync(async (req, _, next) => {
   next();
 });
 
+const validateVerify = catchAsync(async (req, _, next) => {
+  if (!Object.keys(req.body).includes("email"))
+    throw appError(400, `missing field email`);
+
+  const { error } = verifySchema.validate(req.body);
+  if (error) throw appError(400, error.message);
+
+  next();
+});
+
 module.exports = {
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
+  validateVerify,
 };

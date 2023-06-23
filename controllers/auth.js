@@ -1,15 +1,18 @@
 const User = require("../models/userSchema");
-const { catchAsync, appError, sendMail } = require("../utils");
+const { catchAsync, appError, sendEmail } = require("../utils");
 const path = require("path");
 const Jimp = require("jimp");
 const { TOKEN } = require("../config/config");
 const { JWT_SECRET } = process.env;
 
 const registration = catchAsync(async (req, res) => {
-  const result = await User.create(req.body);
-  const { email, subscription } = result;
+  const result = await User.create({ ...req.body, verificationToken: "qwe" });
+  const { email, subscription, verificationToken } = result;
 
-  res.status(201).json({ email, subscription });
+  const info = await sendEmail(email, verificationToken);
+  if (!info) throw appError(401, "Email send error");
+
+  res.status(201).json({ user: { email, subscription } });
 });
 
 const login = catchAsync(async (req, res) => {
@@ -18,7 +21,9 @@ const login = catchAsync(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) throw appError(401, "Email or password is wrong");
 
-  const { subscription, id } = user;
+  const { subscription, id, verify } = user;
+
+  if (!verify) throw appError(401, "User not verify");
 
   const isValidPassword = await user.validPassword(password);
   if (!isValidPassword) throw appError(401, " Email or password is wrong");
@@ -48,7 +53,7 @@ const logout = async (req, res) => {
 
 const current = async (req, res) => {
   const { email, subscription } = req.user;
-  res.status(200).json({ user: { email, subscription } });
+  res.status(200).json({ email, subscription });
 };
 
 const updateSubscription = async (req, res) => {
@@ -84,26 +89,41 @@ const updateAvatar = async (req, res) => {
   });
 };
 
-// const send = sendMail({
-//   to: "vadym.mailforhw@gmail.com",
-//   subject: "Please confirm your email",
-//   html: `<a href="http://localhost:3000/api/users/verify/">Confirm your email</a>`,
-// });
+const sendVerify = catchAsync(async (req, res) => {
+  const { email } = req.body;
 
-const message = "Hi there, you were emailed me through nodemailer";
-const options = {
-  from: "TESTING <sender@gmail.com>", // sender address
-  to: "vadym.mailforhw@gmail.com", // receiver email
-  subject: "Send email in Node.JS with Nodemailer using Gmail account", // Subject line
-  text: message,
-  //html: HTML_TEMPLATE(message),
-};
+  const user = await User.findOne({ email });
 
-// sendMail(options, (info) => {
-//   console.log("Email sent successfully");
-//   console.log("MESSAGE ID: ", info.messageId);
-// });
+  if (!user) throw appError(400);
 
+  const { verificationToken, verify } = user;
+
+  if (verify) throw appError(400, "Verification has already been passed");
+
+  const info = await sendEmail(email, verificationToken);
+
+  if (!info) throw appError(400, "Email send error");
+
+  res.status(200).json({
+    message: "Verification email sent",
+  });
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+  const { verificationToken } = req.params;
+
+  const user = await User.findOne({ verificationToken });
+  if (!user) throw appError(404, "User not found");
+
+  const { id } = user;
+
+  await User.findByIdAndUpdate(id, {
+    verify: true,
+    verificationToken: null,
+  });
+
+  return res.status(200).json({ message: "Verification successful" });
+});
 module.exports = {
   registration,
   login,
@@ -111,4 +131,6 @@ module.exports = {
   current,
   updateSubscription,
   updateAvatar,
+  sendVerify,
+  verifyEmail,
 };
