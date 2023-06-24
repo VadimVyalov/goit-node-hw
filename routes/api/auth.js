@@ -32,8 +32,4 @@ router.patch("/", validateSubscription, updateSubscription);
 router.post("/logout", logout);
 router.get("/current", current);
 
-// vadym.mailforhw@gmail.com
-// pL9EKZVR$GKVVjTj
-// 3dS*EAyMrUHU6d@4
-
 module.exports = router;
