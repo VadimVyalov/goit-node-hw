@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SUBSCRIPTIONS } = require("../config/config");
 const gravatar = require("gravatar");
-
+const { v4 } = require("uuid");
 const user = new Schema(
   {
     password: {
@@ -21,8 +21,22 @@ const user = new Schema(
       enum: SUBSCRIPTIONS,
       default: SUBSCRIPTIONS[0],
     },
-    avatarURL: { type: String },
-    token: String,
+    avatarURL: {
+      type: String,
+      default: null,
+    },
+    token: {
+      type: String,
+      default: null,
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false }
 );
@@ -49,6 +63,9 @@ user.pre("save", async function (next) {
     d: "wavatar",
   });
   this.avatarURL = avatarURL;
+
+  this.verificationToken = v4();
+
   next();
 });
 

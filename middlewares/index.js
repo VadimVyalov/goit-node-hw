@@ -4,6 +4,7 @@ const {
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
+  validateVerify,
 } = require("./userBodyMiddlewares");
 const { auth } = require("./auth");
 const upload = require("./upload");
@@ -16,5 +17,6 @@ module.exports = {
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
+  validateVerify,
   upload,
 };

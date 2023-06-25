@@ -1,5 +1,5 @@
 const User = require("../models/userSchema");
-const { catchAsync, appError } = require("../utils");
+const { catchAsync, appError, sendEmail } = require("../utils");
 const path = require("path");
 const Jimp = require("jimp");
 const { unlink } = require("fs/promises");
@@ -7,8 +7,11 @@ const { TOKEN } = require("../config/config");
 const { JWT_SECRET } = process.env;
 
 const registration = catchAsync(async (req, res) => {
-  const result = await User.create(req.body);
-  const { email, subscription } = result;
+  const result = await User.create({ ...req.body, verificationToken: "qwe" });
+  const { email, subscription, verificationToken } = result;
+
+  const info = await sendEmail(email, verificationToken);
+  if (!info) throw appError(401, "Email send error");
 
   res.status(201).json({ user: { email, subscription } });
 });
@@ -19,7 +22,9 @@ const login = catchAsync(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) throw appError(401, "Email or password is wrong");
 
-  const { subscription, id } = user;
+  const { subscription, id, verify } = user;
+
+  if (!verify) throw appError(401, "User not verify");
 
   const isValidPassword = await user.validPassword(password);
   if (!isValidPassword) throw appError(401, " Email or password is wrong");
@@ -85,6 +90,41 @@ const updateAvatar = async (req, res) => {
   });
 };
 
+const sendVerify = catchAsync(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) throw appError(400);
+
+  const { verificationToken, verify } = user;
+
+  if (verify) throw appError(400, "Verification has already been passed");
+
+  const info = await sendEmail(email, verificationToken);
+
+  if (!info) throw appError(400, "Email send error");
+
+  res.status(200).json({
+    message: "Verification email sent",
+  });
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+  const { verificationToken } = req.params;
+
+  const user = await User.findOne({ verificationToken });
+  if (!user) throw appError(404, "User not found");
+
+  const { id } = user;
+
+  await User.findByIdAndUpdate(id, {
+    verify: true,
+    verificationToken: null,
+  });
+
+  return res.status(200).json({ message: "Verification successful" });
+});
 module.exports = {
   registration,
   login,
@@ -92,4 +132,6 @@ module.exports = {
   current,
   updateSubscription,
   updateAvatar,
+  sendVerify,
+  verifyEmail,
 };
