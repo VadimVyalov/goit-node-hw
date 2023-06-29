@@ -1,6 +1,6 @@
 const appError = require("./appError");
 const mongooseError = require("./mongooseError");
-const catchAsync = require("./catchAsync");
+const { catchAsync } = require("./catchAsync");
 const {
   contactSchema,
   favoriteSchema,
@@ -15,6 +15,7 @@ module.exports = {
   appError,
   mongooseError,
   catchAsync,
+
   contactSchema,
   favoriteSchema,
   registerSchema,

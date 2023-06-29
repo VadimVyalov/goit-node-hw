@@ -1,22 +1,27 @@
 const { checkById } = require("./contactsMiddlewares");
-const { validateBody, validateFavorite } = require("./contactBodyMiddlewares");
+const {
+  validateContactBody,
+  validateFavorite,
+} = require("./contactBodyMiddlewares");
 const {
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
   validateVerify,
+  uploadUserAvatar,
 } = require("./userBodyMiddlewares");
 const { auth } = require("./auth");
-const upload = require("./upload");
+//const ImageService = require('./u');
 
 module.exports = {
   checkById,
-  validateBody,
+  validateContactBody,
   validateFavorite,
   auth,
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
   validateVerify,
-  upload,
+  uploadUserAvatar,
+  //ImageService,
 };

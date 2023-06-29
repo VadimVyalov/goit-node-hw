@@ -16,7 +16,7 @@ const {
   validateRegisterBody,
   validateSubscription,
   validateVerify,
-  upload,
+  uploadUserAvatar,
 } = require("../../middlewares");
 
 const router = Router();
@@ -27,7 +27,7 @@ router.post("/verify", validateVerify, sendVerify);
 router.get("/verify/:verificationToken", verifyEmail);
 
 router.use("/", auth);
-router.patch("/avatars", upload.single("avatar"), updateAvatar);
+router.patch("/avatars", uploadUserAvatar, updateAvatar);
 router.patch("/", validateSubscription, updateSubscription);
 router.post("/logout", logout);
 router.get("/current", current);

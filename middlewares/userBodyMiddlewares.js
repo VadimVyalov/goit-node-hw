@@ -6,6 +6,7 @@ const {
   subscriptionSchema,
   verifySchema,
 } = require("../utils");
+const ImageService = require("../services/ImageService");
 
 const validateRegisterBody = catchAsync(async (req, _, next) => {
   const bodyNoKey = [];
@@ -66,9 +67,12 @@ const validateVerify = catchAsync(async (req, _, next) => {
   next();
 });
 
+const uploadUserAvatar = ImageService.upload("avatar");
+
 module.exports = {
   validateRegisterBody,
   validateLoginBody,
   validateSubscription,
   validateVerify,
+  uploadUserAvatar,
 };

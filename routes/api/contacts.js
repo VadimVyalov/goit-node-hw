@@ -10,7 +10,7 @@ const {
 
 const {
   checkById,
-  validateBody,
+  validateContactBody,
   validateFavorite,
   auth,
 } = require("../../middlewares");
@@ -19,14 +19,14 @@ const router = Router();
 
 router.use("/", auth);
 
-router.route("/").post(validateBody, addContact).get(listContacts);
+router.route("/").post(validateContactBody, addContact).get(listContacts);
 
 router.use("/:id", checkById);
 router
   .route("/:id")
   .get(getById)
   .delete(removeContact)
-  .put(validateBody, updateContact);
+  .put(validateContactBody, updateContact);
 
 router.route("/:id/favorite").patch(validateFavorite, updateStatusContact);
 

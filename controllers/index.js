@@ -1,11 +1,14 @@
+const { catchAsync } = require("../utils");
 const {
-  listContacts,
+  //listContacts,
   getById,
   removeContact,
   addContact,
   updateContact,
   updateStatusContact,
 } = require("./contacts");
+
+const listContacts = require("./listContacts");
 
 const {
   registration,
@@ -16,10 +19,10 @@ const {
   updateAvatar,
   sendVerify,
   verifyEmail,
-} = require("./auth");
+} = require("./user");
 
 module.exports = {
-  listContacts,
+  listContacts: catchAsync(listContacts),
   getById,
   removeContact,
   addContact,
