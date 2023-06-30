@@ -14,11 +14,12 @@ const auth = catchAsync(async (req, _, next) => {
     return decoded.id;
   });
 
-  const user = await User.findById(id);
+  const user = await User.findById(id).select(["token"]);
 
   if (!user || !user.token || user.token !== token)
     throw appError(401, "Not authorized");
-  req.user = user;
+  user.token = undefined;
+  req.user = { id };
   next();
 });
 

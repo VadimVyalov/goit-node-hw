@@ -1,15 +1,13 @@
 const { catchAsync } = require("../utils");
-const {
-  //listContacts,
-  getById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
-} = require("./contacts");
-
-const listContacts = require("./listContacts");
-
+// const {
+//   listContacts,
+//   getById,
+//   removeContact,
+//   addContact,
+//   updateContact,
+//   updateStatusContact,
+// } = require("./contacts");
+const contactsController = require("./contacts");
 const {
   registration,
   login,
@@ -22,12 +20,13 @@ const {
 } = require("./user");
 
 module.exports = {
-  listContacts: catchAsync(listContacts),
-  getById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
+  // listContacts,
+  // getById,
+  // removeContact,
+  // addContact,
+  // updateContact,
+  // updateStatusContact,
+  contactsController,
   registration,
   login,
   logout,

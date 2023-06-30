@@ -1,11 +1,12 @@
 const { Router } = require("express");
 const {
-  listContacts,
-  getById,
-  addContact,
-  removeContact,
-  updateContact,
-  updateStatusContact,
+  // listContacts,
+  // getById,
+  // addContact,
+  // removeContact,
+  // updateContact,
+  // updateStatusContact,
+  contactsController,
 } = require("../../controllers");
 
 const {
@@ -19,15 +20,21 @@ const router = Router();
 
 router.use("/", auth);
 
-router.route("/").post(validateContactBody, addContact).get(listContacts);
+router
+  .route("/")
+  .post(validateContactBody, contactsController.addContact)
+  .get(contactsController.listContacts);
 
 router.use("/:id", checkById);
+
 router
   .route("/:id")
-  .get(getById)
-  .delete(removeContact)
-  .put(validateContactBody, updateContact);
+  .get(contactsController.getById)
+  .delete(contactsController.removeContact)
+  .put(validateContactBody, contactsController.updateContact);
 
-router.route("/:id/favorite").patch(validateFavorite, updateStatusContact);
+router
+  .route("/:id/favorite")
+  .patch(validateFavorite, contactsController.updateStatusContact);
 
 module.exports = router;

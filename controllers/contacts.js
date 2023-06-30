@@ -1,47 +1,52 @@
-const contacts = require("../models");
+const { contactService } = require("../services");
 const { catchAsync } = require("../utils");
 
-const listContacts = catchAsync(async (req, res) => {
-  const { id } = req.user;
-  const params = { id, ...req.query };
-  const result = await contacts.listContacts(params);
-  res.status(200).json(result);
-});
+class ContactsController {
+  listContacts = catchAsync(async (req, res) => {
+    const { id } = req.user;
+    const params = { id, ...req.query };
+    const result = await contactService.list(params);
+    res.status(200).json(result);
+  });
 
-const getById = (req, res) => {
-  res.status(200).json(req.data);
-};
+  getById = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await contactService.getById(id);
+    res.status(200).json(result);
+  });
 
-const removeContact = catchAsync(async (req, res) => {
-  const { id } = req.data;
-  const result = await contacts.removeContact(id);
-  res.status(200).json(result);
-});
+  removeContact = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await contactService.remove(id);
 
-const addContact = catchAsync(async (req, res) => {
-  const { id: owner } = req.user;
-  const result = await contacts.addContact({ ...req.body, owner });
-  res.status(201).json(result);
-});
+    res.status(200).json(result);
+  });
 
-const updateContact = catchAsync(async (req, res) => {
-  const { id } = req.data;
-  const result = await contacts.updateContact(id, req.body);
-  res.status(200).json(result);
-});
+  addContact = catchAsync(async (req, res) => {
+    const { id: owner } = req.user;
+    const result = await contactService.add({ ...req.body, owner });
+    res.status(201).json(result);
+  });
 
-const updateStatusContact = catchAsync(async (req, res) => {
-  const { id } = req.data;
-  const result = await contacts.updateContact(id, req.body);
-  console.log(req.body);
-  res.status(200).json(result);
-});
+  updateContact = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await contactService.update(id, req.body);
+    res.status(200).json(result);
+  });
 
-module.exports = {
-  listContacts,
-  getById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
-};
+  updateStatusContact = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await contacts.update(id, req.body);
+    res.status(200).json(result);
+  });
+}
+const contactsController = new ContactsController();
+module.exports = contactsController;
+// module.exports = {
+//   listContacts,
+//   getById,
+//   removeContact,
+//   addContact,
+//   updateContact,
+//   updateStatusContact,
+// };
