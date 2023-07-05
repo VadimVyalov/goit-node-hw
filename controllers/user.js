@@ -1,140 +1,81 @@
 const User = require("../models/userSchema");
 const { catchAsync, appError, sendEmail } = require("../utils");
 
-const { TOKEN } = require("../config/config");
-const ImageService = require("../services/ImageService");
+const userService = require("../services/userServices");
+class UserController {
+  registration = catchAsync(async (req, res) => {
+    const result = await userService.registration(req.body);
 
-const { JWT_SECRET } = process.env;
+    const { user, verificationToken } = result;
 
-const registration = catchAsync(async (req, res) => {
-  const result = await User.create({ ...req.body, verificationToken: "qwe" });
-  const { email, subscription, verificationToken } = result;
+    await sendEmail(user.email, verificationToken);
 
-  const info = await sendEmail(email, verificationToken);
-  if (!info) throw appError(401, "Email send error");
-  req.body = undefined;
-  res.status(201).json({ user: { email, subscription } });
-});
+    req.body = undefined;
 
-const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
+    res.status(201).json({ user });
+  });
 
-  const user = await User.findOne({ email });
-  if (!user) throw appError(401, "Email or password is wrong");
+  login = catchAsync(async (req, res) => {
+    const result = await userService.login(req.body);
 
-  const { subscription, id, verify } = user;
+    req.body = undefined;
+    res.status(200).json(result);
+  });
 
-  if (!verify) throw appError(401, "User not verify");
+  logout = catchAsync(async (req, res) => {
+    const { id } = req.user;
 
-  const isValidPassword = await user.validPassword(password);
-  if (!isValidPassword) throw appError(401, " Email or password is wrong");
+    await userService.logout(id);
 
-  const token = await user.getToken(JWT_SECRET, TOKEN.access);
-  if (!token) throw appError(401, " Email or password is wrong");
+    res.status(204).json();
+  });
 
-  await User.findByIdAndUpdate(id, { token });
-  req.body = undefined;
-  const result = {
-    token: token,
-    user: {
-      email,
-      subscription,
-    },
+  current = async (req, res) => {
+    const { id } = req.user;
+    const user = await userService.current(id);
+
+    res.status(200).json(user);
   };
 
-  res.status(200).json(result);
-});
+  updateSubscription = async (req, res) => {
+    const { id } = req.user;
+    const { subscription } = req.body;
 
-const logout = async (req, res) => {
-  const { id } = req.user;
-  await User.findByIdAndUpdate(id, { token: "" });
+    await userService.updateSubscription(id, subscription);
 
-  res.status(204).json();
-};
+    res
+      .status(200)
+      .json({ message: `Subscription updated to '${subscription}'` });
+  };
 
-const current = async (req, res) => {
-  const { id } = req.user;
-  const user = await User.findById(id).select([
-    "email",
-    "subscription",
-    "-_id",
-  ]);
+  updateAvatar = async (req, res) => {
+    const { id } = req.user;
+    const { file } = req;
 
-  res.status(200).json(user);
-};
+    const avatarURL = await userService.updateAvatar(id, file);
 
-const updateSubscription = async (req, res) => {
-  const { id } = req.user;
-  const { subscription } = req.body;
+    res.status(200).json({
+      avatarURL,
+    });
+  };
 
-  await User.findByIdAndUpdate(id, { subscription }, { new: true });
+  sendVerify = catchAsync(async (req, res) => {
+    const { email } = req.body;
 
-  res
-    .status(200)
-    .json({ message: `Subscription updated to '${subscription}'` });
-};
+    await userService.sendVerify(email);
 
-const updateAvatar = async (req, res) => {
-  const { id } = req.user;
-  const { file } = req;
-
-  if (!file) throw appError(401, "File is require!");
-
-  const avatarURL = await ImageService.save(
-    file,
-    { width: 250, height: 250 },
-    "avatars"
-  );
-
-  await User.findByIdAndUpdate(id, { avatarURL }, { new: true });
-
-  res.status(200).json({
-    avatarURL,
-  });
-};
-
-const sendVerify = catchAsync(async (req, res) => {
-  const { email } = req.body;
-
-  const user = await User.findOne({ email });
-
-  if (!user) throw appError(400);
-
-  const { verificationToken, verify } = user;
-
-  if (verify) throw appError(400, "Verification has already been passed");
-
-  const info = await sendEmail(email, verificationToken);
-
-  if (!info) throw appError(400, "Email send error");
-
-  res.status(200).json({
-    message: "Verification email sent",
-  });
-});
-
-const verifyEmail = catchAsync(async (req, res) => {
-  const { verificationToken } = req.params;
-
-  const user = await User.findOne({ verificationToken });
-  if (!user) throw appError(404, "User not found");
-
-  const { id } = user;
-
-  await User.findByIdAndUpdate(id, {
-    verify: true,
-    verificationToken: null,
+    res.status(200).json({
+      message: "Verification email sent",
+    });
   });
 
-  return res.status(200).json({ message: "Verification successful" });
-});
-module.exports = {
-  registration,
-  login,
-  logout,
-  current,
-  updateSubscription,
-  updateAvatar,
-  sendVerify,
-  verifyEmail,
-};
+  verifyEmail = catchAsync(async (req, res) => {
+    const { verificationToken } = req.params;
+
+    await userService.verifyEmail(verificationToken);
+
+    return res.status(200).json({ message: "Verification successful" });
+  });
+}
+const userController = new UserController();
+module.exports = userController;

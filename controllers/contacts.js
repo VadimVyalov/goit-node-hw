@@ -18,7 +18,6 @@ class ContactsController {
   removeContact = catchAsync(async (req, res) => {
     const { id } = req.params;
     const result = await contactService.remove(id);
-
     res.status(200).json(result);
   });
 
@@ -41,12 +40,5 @@ class ContactsController {
   });
 }
 const contactsController = new ContactsController();
+
 module.exports = contactsController;
-// module.exports = {
-//   listContacts,
-//   getById,
-//   removeContact,
-//   addContact,
-//   updateContact,
-//   updateStatusContact,
-// };

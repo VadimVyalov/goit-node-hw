@@ -1,3 +1,3 @@
 const contactService = require("./contactsServices");
-
-module.exports = { contactService };
+const userService = require("./userServices");
+module.exports = { contactService, userService };

@@ -8,7 +8,7 @@ class ImageService {
   static upload(name) {
     const multerStorage = multer.memoryStorage();
 
-    const multerFilter = (req, file, callBackFunc) => {
+    const multerFilter = (_, file, callBackFunc) => {
       if (file.mimetype.startsWith("image")) {
         callBackFunc(null, true);
       } else {

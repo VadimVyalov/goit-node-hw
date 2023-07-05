@@ -11,7 +11,6 @@ const {
   uploadUserAvatar,
 } = require("./userBodyMiddlewares");
 const { auth } = require("./auth");
-//const ImageService = require('./u');
 
 module.exports = {
   checkById,

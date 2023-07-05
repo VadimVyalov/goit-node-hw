@@ -1,14 +1,5 @@
 const { Router } = require("express");
-const {
-  registration,
-  login,
-  logout,
-  current,
-  updateSubscription,
-  updateAvatar,
-  sendVerify,
-  verifyEmail,
-} = require("../../controllers");
+const { userController } = require("../../controllers");
 
 const {
   auth,
@@ -21,15 +12,15 @@ const {
 
 const router = Router();
 
-router.post("/register", validateRegisterBody, registration);
-router.post("/login", validateLoginBody, login);
-router.post("/verify", validateVerify, sendVerify);
-router.get("/verify/:verificationToken", verifyEmail);
+router.post("/register", validateRegisterBody, userController.registration);
+router.post("/login", validateLoginBody, userController.login);
+router.post("/verify", validateVerify, userController.sendVerify);
+router.get("/verify/:verificationToken", userController.verifyEmail);
 
 router.use("/", auth);
-router.patch("/avatars", uploadUserAvatar, updateAvatar);
-router.patch("/", validateSubscription, updateSubscription);
-router.post("/logout", logout);
-router.get("/current", current);
+router.get("/current", userController.current);
+router.patch("/avatars", uploadUserAvatar, userController.updateAvatar);
+router.patch("/", validateSubscription, userController.updateSubscription);
+router.post("/logout", userController.logout);
 
 module.exports = router;
