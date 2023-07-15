@@ -16,9 +16,9 @@ class UserServuces {
 
   login = async (body) => {
     const { TOKEN } = require("../config/config");
-    const { JWT_SECRET } = process.env;
+    const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = process.env;
     const { email, password } = body;
-
+    const token = {};
     const user = await User.findOne({ email });
     if (!user) throw appError(401, "Email or password is wrong");
 
@@ -28,19 +28,46 @@ class UserServuces {
     const isValidPassword = await user.validPassword(password);
     if (!isValidPassword) throw appError(401, " Email or password is wrong");
 
-    const token = await user.getToken(JWT_SECRET, TOKEN.access);
-    if (!token) throw appError(401, " Email or password is wrong");
+    token.access = await user.getToken(JWT_ACCESS_SECRET, TOKEN.access);
+    if (!token.access) throw appError(401, " Email or password is wrong");
 
-    await User.findByIdAndUpdate(id, { token });
+    token.refresh = await user.getToken(JWT_REFRESH_SECRET, TOKEN.refresh);
+    if (!token.refresh) throw appError(401, " Email or password is wrong");
+
+    await User.findByIdAndUpdate(id, {
+      token,
+    });
 
     const result = {
-      token: token,
+      token,
       user: {
         email,
         subscription,
       },
     };
     return result;
+  };
+
+  refresh = async (id) => {
+    const { TOKEN } = require("../config/config");
+    const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = process.env;
+
+    const token = {};
+
+    const user = await User.findById(id);
+    if (!user) throw appError(401, "Refresh denied");
+
+    token.access = await user.getToken(JWT_ACCESS_SECRET, TOKEN.access);
+    if (!token.access) throw appError(401, "Refresh denied");
+
+    token.refresh = await user.getToken(JWT_REFRESH_SECRET, TOKEN.refresh);
+    if (!token.refresh) throw appError(401, "Refresh denied");
+
+    await User.findByIdAndUpdate(id, {
+      token,
+    });
+
+    return token;
   };
 
   logout = async (id) => {

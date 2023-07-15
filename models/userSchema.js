@@ -26,9 +26,16 @@ const user = new Schema(
       default: null,
     },
     token: {
-      type: String,
-      default: null,
+      access: {
+        type: String,
+        default: null,
+      },
+      refresh: {
+        type: String,
+        default: null,
+      },
     },
+
     verify: {
       type: Boolean,
       default: false,

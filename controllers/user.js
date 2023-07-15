@@ -8,7 +8,7 @@ class UserController {
 
     const { user, verificationToken } = result;
 
-    await sendEmail(user.email, verificationToken);
+    //await sendEmail(user.email, verificationToken);
 
     req.body = undefined;
 
@@ -20,6 +20,14 @@ class UserController {
 
     req.body = undefined;
     res.status(200).json(result);
+  });
+
+  refresh = catchAsync(async (req, res) => {
+    const { id } = req.user;
+
+    const result = await userService.refresh(id);
+
+    res.status(200).json({ token: result });
   });
 
   logout = catchAsync(async (req, res) => {

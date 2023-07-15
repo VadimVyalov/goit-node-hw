@@ -1,6 +1,6 @@
 const SUBSCRIPTIONS = ["starter", "pro", "business"];
 const TOKEN = {
-  access: "300s",
-  refresh: "600s",
+  access: "30s",
+  refresh: "60s",
 };
 module.exports = { SUBSCRIPTIONS, TOKEN };
