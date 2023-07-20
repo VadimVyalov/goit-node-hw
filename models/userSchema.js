@@ -26,9 +26,16 @@ const user = new Schema(
       default: null,
     },
     token: {
-      type: String,
-      default: null,
+      access: {
+        type: String,
+        default: null,
+      },
+      refresh: {
+        type: String,
+        default: null,
+      },
     },
+
     verify: {
       type: Boolean,
       default: false,
@@ -55,16 +62,20 @@ user.methods.getToken = function (secret, exp) {
 user.post("save", mongooseError);
 
 user.pre("save", async function (next) {
+  if (this.isNew) {
+    const avatarURL = gravatar.url(this.email, {
+      s: "250",
+      r: "g",
+      d: "wavatar",
+    });
+    this.avatarURL = avatarURL;
+    this.verificationToken = v4();
+  }
+
+  if (!this.isModified("password")) return next();
+
   const salt = await bcrypt.genSalt();
   this.password = await bcrypt.hash(this.password, salt);
-  const avatarURL = gravatar.url(this.email, {
-    s: "250",
-    r: "g",
-    d: "wavatar",
-  });
-  this.avatarURL = avatarURL;
-
-  this.verificationToken = v4();
 
   next();
 });

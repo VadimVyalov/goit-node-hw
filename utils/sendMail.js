@@ -27,6 +27,7 @@ const sendEmail = async (email, token) => {
     return info;
   } catch (error) {
     // console.log(error);
+    throw appError(401, "Email send error");
   }
 };
 
