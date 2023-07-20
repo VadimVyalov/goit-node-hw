@@ -25,9 +25,9 @@ class UserController {
   refresh = catchAsync(async (req, res) => {
     const { id } = req.user;
 
-    const result = await userService.refresh(id);
+    const token = await userService.refresh(id);
 
-    res.status(200).json({ token: result });
+    res.status(200).json({ token });
   });
 
   logout = catchAsync(async (req, res) => {
